@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: 340px;
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: #0f1117;
+    color: #e2e4e9;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  /* ── Header ─────────────────────────── */
+  .header {
+    padding: 16px 18px 12px;
+    border-bottom: 1px solid #1e2130;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .header-icon {
+    width: 28px; height: 28px;
+    border-radius: 6px;
+    background: #22c55e;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+  .header-icon.inactive { background: #ef4444; }
+  .header h1 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #f0f1f4;
+    letter-spacing: -0.01em;
+  }
+  .header .status {
+    font-size: 11px;
+    color: #8b8fa3;
+    font-weight: 400;
+  }
+
+  /* ── Not activated banner ───────────── */
+  .not-activated {
+    padding: 18px;
+    text-align: center;
+    color: #8b8fa3;
+  }
+  .not-activated p { margin-bottom: 12px; }
+  .btn-setup {
+    display: inline-block;
+    padding: 8px 20px;
+    background: #3b82f6;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .btn-setup:hover { background: #2563eb; }
+
+  /* ── Current site section ───────────── */
+  .current-site {
+    padding: 14px 18px;
+    border-bottom: 1px solid #1e2130;
+  }
+  .current-site .label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #5c6070;
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+  .site-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .site-domain {
+    font-size: 14px;
+    font-weight: 500;
+    color: #f0f1f4;
+    word-break: break-all;
+  }
+
+  /* ── Toggle switch ──────────────────── */
+  .toggle-wrap {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .toggle-label {
+    font-size: 11px;
+    color: #8b8fa3;
+    font-weight: 500;
+  }
+  .toggle-label.allowed { color: #22c55e; }
+  .toggle-label.blocked { color: #ef4444; }
+  .toggle {
+    position: relative;
+    width: 40px; height: 22px;
+    cursor: pointer;
+  }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .slider {
+    position: absolute; inset: 0;
+    background: #ef4444;
+    border-radius: 11px;
+    transition: background 0.2s;
+  }
+  .slider::before {
+    content: "";
+    position: absolute;
+    width: 16px; height: 16px;
+    left: 3px; bottom: 3px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.2s;
+  }
+  .toggle input:checked + .slider { background: #22c55e; }
+  .toggle input:checked + .slider::before { transform: translateX(18px); }
+
+  /* ── Info line ──────────────────────── */
+  .info-line {
+    padding: 10px 18px;
+    font-size: 11px;
+    color: #5c6070;
+    border-bottom: 1px solid #1e2130;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .dot.green { background: #22c55e; }
+  .dot.red { background: #ef4444; }
+
+  /* ── Footer links ───────────────────── */
+  .footer {
+    padding: 10px 18px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .footer-link {
+    font-size: 11px;
+    color: #3b82f6;
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-family: inherit;
+  }
+  .footer-link:hover { color: #60a5fa; text-decoration: underline; }
+
+  /* ── Whitelist panel ────────────────── */
+  .whitelist-panel {
+    display: none;
+    max-height: 260px;
+    overflow-y: auto;
+    border-top: 1px solid #1e2130;
+  }
+  .whitelist-panel.show { display: block; }
+  .wl-header {
+    padding: 10px 18px;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #5c6070;
+    font-weight: 600;
+    background: #13151e;
+    position: sticky;
+    top: 0;
+  }
+  .wl-item {
+    padding: 6px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #1a1c28;
+  }
+  .wl-item:hover { background: #181b26; }
+  .wl-domain { font-size: 12px; color: #c8cad2; }
+  .wl-remove {
+    font-size: 10px;
+    color: #ef4444;
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-family: inherit;
+    opacity: 0.6;
+  }
+  .wl-remove:hover { opacity: 1; }
+  .wl-empty {
+    padding: 16px 18px;
+    font-size: 12px;
+    color: #5c6070;
+    text-align: center;
+  }
+
+  /* ── Internal pages notice ──────────── */
+  .internal-notice {
+    padding: 20px 18px;
+    text-align: center;
+    color: #5c6070;
+    font-size: 12px;
+  }
+
+  /* ── Master toggle ──────────────────── */
+  .master-row {
+    padding: 10px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #1e2130;
+    background: #13151e;
+  }
+  .master-label {
+    font-size: 11px;
+    color: #8b8fa3;
+    font-weight: 500;
+  }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <!-- Header -->
+  <div class="header">
+    <div class="header-icon" id="headerIcon">🛡</div>
+    <div>
+      <h1>Cookie Gatekeeper</h1>
+      <div class="status" id="headerStatus">Loading...</div>
+    </div>
+  </div>
+
+  <!-- Not activated state -->
+  <div class="not-activated" id="notActivated" style="display:none;">
+    <p>Protection is not active. Complete setup to start blocking cookies by default.</p>
+    <button class="btn-setup" id="btnSetup">Open Setup</button>
+  </div>
+
+  <!-- Internal page notice -->
+  <div class="internal-notice" id="internalNotice" style="display:none;">
+    This is a browser internal page.<br>Cookie settings do not apply here.
+  </div>
+
+  <!-- Active state: current site -->
+  <div id="activeContent" style="display:none;">
+    <div class="current-site">
+      <div class="label">Current Site</div>
+      <div class="site-row">
+        <span class="site-domain" id="siteDomain">--</span>
+        <div class="toggle-wrap">
+          <span class="toggle-label" id="toggleLabel">Blocked</span>
+          <label class="toggle">
+            <input type="checkbox" id="cookieToggle">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-line" id="infoLine">
+      <span class="dot red"></span>
+      <span>Cookies blocked for this site</span>
+    </div>
+
+    <!-- Master protection toggle -->
+    <div class="master-row">
+      <span class="master-label">Global Protection</span>
+      <div class="toggle-wrap">
+        <span class="toggle-label" id="masterLabel" style="color:#22c55e;">Active</span>
+        <label class="toggle">
+          <input type="checkbox" id="masterToggle" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer" id="footerLinks" style="display:none;">
+    <button class="footer-link" id="btnWhitelist">View Whitelist</button>
+    <button class="footer-link" id="btnBraveCookies">Brave Cookie Settings</button>
+  </div>
+
+  <!-- Whitelist panel -->
+  <div class="whitelist-panel" id="whitelistPanel">
+    <div class="wl-header">Whitelisted Domains (<span id="wlCount">0</span>)</div>
+    <div id="wlList"></div>
+  </div>
+</div>
+
+<script src="popup.js"></script>
+</body>
+</html>

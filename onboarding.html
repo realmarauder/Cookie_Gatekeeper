@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Cookie Gatekeeper - Setup</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: #0a0b10;
+    color: #d1d3db;
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 40px 24px 60px;
+  }
+
+  /* ── Header ─────────────────────────── */
+  .page-header {
+    text-align: center;
+    margin-bottom: 36px;
+  }
+  .shield {
+    width: 56px; height: 56px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    margin-bottom: 16px;
+  }
+  .page-header h1 {
+    font-size: 26px;
+    font-weight: 700;
+    color: #f0f1f4;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+  }
+  .page-header p {
+    color: #7a7e92;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  /* ── Steps indicator ────────────────── */
+  .steps {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 32px;
+  }
+  .step-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #2a2d3e;
+    transition: background 0.3s, width 0.3s;
+  }
+  .step-dot.active {
+    width: 28px;
+    border-radius: 4px;
+    background: #3b82f6;
+  }
+  .step-dot.done { background: #22c55e; }
+
+  /* ── Cards ──────────────────────────── */
+  .card {
+    background: #12141d;
+    border: 1px solid #1e2130;
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  .card h2 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #f0f1f4;
+    margin-bottom: 6px;
+  }
+  .card .subtitle {
+    font-size: 13px;
+    color: #6b6f83;
+    margin-bottom: 18px;
+  }
+
+  /* ── Domain list ────────────────────── */
+  .toolbar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+  .search-box {
+    flex: 1;
+    min-width: 180px;
+    padding: 8px 12px;
+    background: #0f1117;
+    border: 1px solid #1e2130;
+    border-radius: 6px;
+    color: #d1d3db;
+    font-size: 13px;
+    font-family: inherit;
+    outline: none;
+  }
+  .search-box:focus { border-color: #3b82f6; }
+  .search-box::placeholder { color: #4a4e60; }
+
+  .btn-sm {
+    padding: 7px 14px;
+    font-size: 12px;
+    font-weight: 500;
+    border: 1px solid #1e2130;
+    background: #181b26;
+    color: #d1d3db;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    white-space: nowrap;
+  }
+  .btn-sm:hover { background: #1e2130; color: #f0f1f4; }
+  .btn-sm.active { background: #3b82f6; border-color: #3b82f6; color: #fff; }
+
+  .domain-list {
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid #1e2130;
+    border-radius: 6px;
+  }
+  .domain-row {
+    display: flex;
+    align-items: center;
+    padding: 8px 14px;
+    border-bottom: 1px solid #161824;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .domain-row:last-child { border-bottom: none; }
+  .domain-row:hover { background: #181b26; }
+
+  .domain-check {
+    width: 18px; height: 18px;
+    border-radius: 4px;
+    border: 2px solid #3a3d50;
+    margin-right: 12px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+  }
+  .domain-row.selected .domain-check {
+    background: #22c55e;
+    border-color: #22c55e;
+  }
+  .domain-row.selected .domain-check::after {
+    content: "";
+    display: block;
+    width: 5px; height: 9px;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+    margin-top: -2px;
+  }
+
+  .domain-name {
+    flex: 1;
+    font-size: 13px;
+    color: #d1d3db;
+    font-weight: 500;
+  }
+  .domain-row.selected .domain-name { color: #f0f1f4; }
+
+  .domain-meta {
+    font-size: 11px;
+    color: #5c6070;
+    text-align: right;
+  }
+  .domain-meta .count {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .domain-row.suggested {
+    background: #13161f;
+  }
+
+  /* ── Common site badges ─────────────── */
+  .badge {
+    display: inline-block;
+    padding: 1px 7px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-radius: 3px;
+    margin-left: 8px;
+  }
+  .badge.login { background: #1e3a5f; color: #60a5fa; }
+  .badge.common { background: #1a3324; color: #4ade80; }
+
+  /* ── Summary stats ──────────────────── */
+  .stats-bar {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+  }
+  .stat {
+    font-size: 12px;
+    color: #6b6f83;
+  }
+  .stat strong {
+    color: #f0f1f4;
+    font-weight: 600;
+    font-size: 18px;
+    display: block;
+    line-height: 1.2;
+    margin-bottom: 2px;
+  }
+
+  /* ── Action buttons ─────────────────── */
+  .actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+  }
+  .btn-primary {
+    padding: 10px 28px;
+    background: #22c55e;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s;
+  }
+  .btn-primary:hover { background: #16a34a; }
+  .btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .btn-secondary {
+    padding: 10px 20px;
+    background: transparent;
+    color: #8b8fa3;
+    border: 1px solid #2a2d3e;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .btn-secondary:hover { border-color: #3b82f6; color: #d1d3db; }
+
+  /* ── Info callout ────────────────────── */
+  .callout {
+    background: #111827;
+    border-left: 3px solid #3b82f6;
+    padding: 12px 16px;
+    font-size: 12px;
+    color: #8b8fa3;
+    border-radius: 0 6px 6px 0;
+    margin-top: 16px;
+  }
+  .callout strong { color: #d1d3db; }
+
+  /* ── Done state ─────────────────────── */
+  .done-state {
+    display: none;
+    text-align: center;
+    padding: 40px 0;
+  }
+  .done-state .check-circle {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    background: #22c55e;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    margin-bottom: 20px;
+  }
+  .done-state h2 {
+    font-size: 22px;
+    color: #f0f1f4;
+    margin-bottom: 8px;
+  }
+  .done-state p {
+    color: #6b6f83;
+    max-width: 420px;
+    margin: 0 auto 24px;
+  }
+
+  /* ── Cleanup step ─────────────────── */
+  .cleanup-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 14px;
+  }
+  .cleanup-section {
+    background: #0f1117;
+    border: 1px solid #1e2130;
+    border-radius: 6px;
+    padding: 12px 14px;
+  }
+  .cleanup-section-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    font-size: 12px;
+    color: #d1d3db;
+  }
+  .cleanup-domain-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    max-height: 120px;
+    overflow-y: auto;
+  }
+  .domain-tag {
+    display: inline-block;
+    padding: 3px 10px;
+    font-size: 11px;
+    border-radius: 4px;
+    font-family: "SF Mono", "Consolas", monospace;
+  }
+  .domain-tag.kept {
+    background: #132b1a;
+    color: #4ade80;
+    border: 1px solid #1a3d24;
+  }
+  .domain-tag.remove {
+    background: #2a1215;
+    color: #f87171;
+    border: 1px solid #3d1a1e;
+  }
+  .btn-danger {
+    background: #dc2626 !important;
+  }
+  .btn-danger:hover {
+    background: #b91c1c !important;
+  }
+  .cleanup-progress {
+    margin-top: 16px;
+  }
+
+  /* ── Scrollbar ──────────────────────── */
+  .domain-list::-webkit-scrollbar { width: 6px; }
+  .domain-list::-webkit-scrollbar-track { background: transparent; }
+  .domain-list::-webkit-scrollbar-thumb { background: #2a2d3e; border-radius: 3px; }
+  .domain-list::-webkit-scrollbar-thumb:hover { background: #3a3d50; }
+
+  /* ── Loading ────────────────────────── */
+  .loading {
+    text-align: center;
+    padding: 40px;
+    color: #5c6070;
+  }
+  .spinner {
+    width: 24px; height: 24px;
+    border: 2px solid #2a2d3e;
+    border-top-color: #3b82f6;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 12px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="shield">🛡</div>
+    <h1>Cookie Gatekeeper Setup</h1>
+    <p>Your browser has existing cookies. Select the sites you want to keep cookies for, then activate protection to block everything else.</p>
+  </div>
+
+  <!-- Steps -->
+  <div class="steps">
+    <div class="step-dot active" id="step1"></div>
+    <div class="step-dot" id="step2"></div>
+    <div class="step-dot" id="step3"></div>
+  </div>
+
+  <!-- Step 1: Review domains -->
+  <div id="stepReview">
+    <div class="card">
+      <h2>Review Your Existing Cookies</h2>
+      <p class="subtitle">Check the domains where you want to keep cookies (logins, preferences, etc.). Unchecked domains will have cookies blocked going forward.</p>
+
+      <div class="stats-bar" id="statsBar">
+        <div class="stat">
+          <strong id="totalDomains">--</strong>
+          Domains found
+        </div>
+        <div class="stat">
+          <strong id="totalCookies">--</strong>
+          Total cookies
+        </div>
+        <div class="stat">
+          <strong id="selectedCount">0</strong>
+          Selected to keep
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <input type="text" class="search-box" id="searchBox" placeholder="Search domains...">
+        <button class="btn-sm" id="btnSelectCommon">Select Common Sites</button>
+        <button class="btn-sm" id="btnSelectAll">Select All</button>
+        <button class="btn-sm" id="btnSelectNone">Clear All</button>
+      </div>
+
+      <div class="domain-list" id="domainList">
+        <div class="loading">
+          <div class="spinner"></div>
+          Scanning cookies...
+        </div>
+      </div>
+
+      <div class="callout">
+        <strong>Note:</strong> This does not delete existing cookies. It only determines which sites will be allowed to set cookies going forward. You can manage or delete existing cookies in Brave at <strong>brave://settings/cookies</strong>.
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn-secondary" id="btnBraveCookies">View Existing Cookies in Brave</button>
+      <button class="btn-primary" id="btnActivate">Activate Protection</button>
+    </div>
+  </div>
+
+  <!-- Step 2: Cleanup -->
+  <div id="stepCleanup" style="display:none;">
+    <div class="card">
+      <h2>Clean Up Unwanted Site Data</h2>
+      <p class="subtitle">Your browser has <strong>2.5GB+</strong> of stored site data (cookies, localStorage, caches, databases) across hundreds of domains. Most of it comes from sites you visited once and will never return to.</p>
+
+      <div class="cleanup-summary" id="cleanupSummary">
+        <div class="cleanup-section">
+          <div class="cleanup-section-header kept">
+            <span class="dot green"></span>
+            <strong>Protected: <span id="cleanupKeptCount">0</span> whitelisted domains (will NOT be touched)</strong>
+          </div>
+          <div class="cleanup-domain-tags" id="keptDomainTags"></div>
+        </div>
+
+        <div class="cleanup-section" style="border-color:#3d1a1e;">
+          <div class="cleanup-section-header remove">
+            <span class="dot red"></span>
+            <strong>Everything else: ALL stored data will be deleted</strong>
+          </div>
+          <p style="font-size:12px; color:#8b8fa3; margin-top:4px;">
+            This includes every domain not listed above. Cookies, localStorage, IndexedDB, Cache Storage, and Service Workers from non-whitelisted sites will be permanently removed. This is the data you see at <strong>brave://settings/content/all</strong>.
+          </p>
+        </div>
+      </div>
+
+      <div class="callout" style="margin-top:16px;">
+        <strong>How it works:</strong> Instead of trying to find and list every unwanted domain, Cookie Gatekeeper tells Brave to wipe ALL site data except your whitelisted domains. This catches everything, including sites that stored data without setting traditional cookies.
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn-secondary" id="btnSkipCleanup">Skip (Keep All Existing Data)</button>
+      <button class="btn-primary btn-danger" id="btnDeleteCookies">Delete All Non-Whitelisted Site Data</button>
+    </div>
+
+    <!-- Progress overlay -->
+    <div class="cleanup-progress" id="cleanupProgress" style="display:none;">
+      <div class="card" style="text-align:center; padding:32px;">
+        <div class="spinner"></div>
+        <p style="margin-top:12px; color:#8b8fa3;">Deleting site data... This may take a moment.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 3: Done -->
+  <div class="done-state" id="stepDone">
+    <div class="check-circle">✓</div>
+    <h2>Protection is Active</h2>
+    <p>All cookies are now blocked by default. Your <strong id="doneCount">0</strong> whitelisted sites will continue to work normally. <span id="doneDeleteInfo"></span>Click the extension icon on any site to toggle cookies on or off.</p>
+    <button class="btn-primary" id="btnClose">Close Setup</button>
+  </div>
+
+</div>
+
+<script src="onboarding.js"></script>
+</body>
+</html>
