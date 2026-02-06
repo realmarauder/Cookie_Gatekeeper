@@ -65,7 +65,7 @@
 
   /* ── Current site section ───────────── */
   .current-site {
-    padding: 14px 18px;
+    padding: 14px 18px 10px;
     border-bottom: 1px solid #1e2130;
   }
   .current-site .label {
@@ -73,22 +73,88 @@
     text-transform: uppercase;
     letter-spacing: 0.08em;
     color: #5c6070;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     font-weight: 600;
-  }
-  .site-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
   }
   .site-domain {
     font-size: 14px;
     font-weight: 500;
     color: #f0f1f4;
     word-break: break-all;
+    margin-bottom: 10px;
   }
 
-  /* ── Toggle switch ──────────────────── */
+  /* ── 3-mode selector ────────────────── */
+  .mode-selector {
+    display: flex;
+    gap: 0;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid #2a2d3e;
+  }
+  .mode-btn {
+    flex: 1;
+    padding: 7px 4px;
+    font-size: 11px;
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+    border: none;
+    background: #181b26;
+    color: #6b6f83;
+    font-family: inherit;
+    transition: all 0.15s;
+    letter-spacing: 0.02em;
+  }
+  .mode-btn:not(:last-child) {
+    border-right: 1px solid #2a2d3e;
+  }
+  .mode-btn:hover { background: #1e2130; color: #a0a3b5; }
+  .mode-btn.active-blocked {
+    background: #3b1520;
+    color: #f87171;
+    border-color: #5c2030;
+  }
+  .mode-btn.active-session {
+    background: #3b2f10;
+    color: #fbbf24;
+    border-color: #5c4a20;
+  }
+  .mode-btn.active-allowed {
+    background: #132b1a;
+    color: #4ade80;
+    border-color: #1a3d24;
+  }
+
+  /* ── Info line ──────────────────────── */
+  .info-line {
+    padding: 10px 18px;
+    font-size: 11px;
+    color: #5c6070;
+    border-bottom: 1px solid #1e2130;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .dot.green { background: #22c55e; }
+  .dot.red { background: #ef4444; }
+  .dot.amber { background: #f59e0b; }
+
+  /* ── Master toggle ──────────────────── */
+  .master-row {
+    padding: 10px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #1e2130;
+    background: #13151e;
+  }
+  .master-label {
+    font-size: 11px;
+    color: #8b8fa3;
+    font-weight: 500;
+  }
   .toggle-wrap {
     display: flex; align-items: center; gap: 8px;
   }
@@ -97,8 +163,6 @@
     color: #8b8fa3;
     font-weight: 500;
   }
-  .toggle-label.allowed { color: #22c55e; }
-  .toggle-label.blocked { color: #ef4444; }
   .toggle {
     position: relative;
     width: 40px; height: 22px;
@@ -123,25 +187,12 @@
   .toggle input:checked + .slider { background: #22c55e; }
   .toggle input:checked + .slider::before { transform: translateX(18px); }
 
-  /* ── Info line ──────────────────────── */
-  .info-line {
-    padding: 10px 18px;
-    font-size: 11px;
-    color: #5c6070;
-    border-bottom: 1px solid #1e2130;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-  .dot.green { background: #22c55e; }
-  .dot.red { background: #ef4444; }
-
   /* ── Footer links ───────────────────── */
   .footer {
-    padding: 10px 18px;
+    padding: 8px 18px;
     display: flex;
-    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 4px 14px;
   }
   .footer-link {
     font-size: 11px;
@@ -150,18 +201,19 @@
     background: none;
     border: none;
     font-family: inherit;
+    padding: 2px 0;
   }
   .footer-link:hover { color: #60a5fa; text-decoration: underline; }
 
-  /* ── Whitelist panel ────────────────── */
-  .whitelist-panel {
+  /* ── Panels (whitelist, etc) ─────────── */
+  .panel {
     display: none;
-    max-height: 260px;
+    max-height: 280px;
     overflow-y: auto;
     border-top: 1px solid #1e2130;
   }
-  .whitelist-panel.show { display: block; }
-  .wl-header {
+  .panel.show { display: block; }
+  .panel-header {
     padding: 10px 18px;
     font-size: 10px;
     text-transform: uppercase;
@@ -180,7 +232,28 @@
     border-bottom: 1px solid #1a1c28;
   }
   .wl-item:hover { background: #181b26; }
-  .wl-domain { font-size: 12px; color: #c8cad2; }
+  .wl-domain {
+    font-size: 12px;
+    color: #c8cad2;
+    flex: 1;
+  }
+  .wl-badge {
+    font-size: 9px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 1px 6px;
+    border-radius: 3px;
+    margin: 0 8px;
+  }
+  .wl-badge.perm {
+    background: #132b1a;
+    color: #4ade80;
+  }
+  .wl-badge.sess {
+    background: #3b2f10;
+    color: #fbbf24;
+  }
   .wl-remove {
     font-size: 10px;
     color: #ef4444;
@@ -198,6 +271,16 @@
     text-align: center;
   }
 
+  /* ── Import result ──────────────────── */
+  .import-msg {
+    padding: 8px 18px;
+    font-size: 11px;
+    display: none;
+    border-bottom: 1px solid #1e2130;
+  }
+  .import-msg.success { color: #4ade80; display: block; }
+  .import-msg.error { color: #f87171; display: block; }
+
   /* ── Internal pages notice ──────────── */
   .internal-notice {
     padding: 20px 18px;
@@ -206,20 +289,13 @@
     font-size: 12px;
   }
 
-  /* ── Master toggle ──────────────────── */
-  .master-row {
-    padding: 10px 18px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #1e2130;
-    background: #13151e;
-  }
-  .master-label {
-    font-size: 11px;
-    color: #8b8fa3;
-    font-weight: 500;
-  }
+  /* ── Scrollbar ──────────────────────── */
+  .panel::-webkit-scrollbar { width: 6px; }
+  .panel::-webkit-scrollbar-track { background: transparent; }
+  .panel::-webkit-scrollbar-thumb { background: #2a2d3e; border-radius: 3px; }
+
+  /* ── Hidden file input ──────────────── */
+  #importFile { display: none; }
 </style>
 </head>
 <body>
@@ -249,15 +325,11 @@
   <div id="activeContent" style="display:none;">
     <div class="current-site">
       <div class="label">Current Site</div>
-      <div class="site-row">
-        <span class="site-domain" id="siteDomain">--</span>
-        <div class="toggle-wrap">
-          <span class="toggle-label" id="toggleLabel">Blocked</span>
-          <label class="toggle">
-            <input type="checkbox" id="cookieToggle">
-            <span class="slider"></span>
-          </label>
-        </div>
+      <div class="site-domain" id="siteDomain">--</div>
+      <div class="mode-selector">
+        <button class="mode-btn" data-mode="blocked" id="modeBlocked">Blocked</button>
+        <button class="mode-btn" data-mode="session" id="modeSession">Session Only</button>
+        <button class="mode-btn" data-mode="allowed" id="modeAllowed">Allowed</button>
       </div>
     </div>
 
@@ -279,15 +351,25 @@
     </div>
   </div>
 
+  <!-- Import result message -->
+  <div class="import-msg" id="importMsg"></div>
+
   <!-- Footer -->
   <div class="footer" id="footerLinks" style="display:none;">
-    <button class="footer-link" id="btnWhitelist">View Whitelist</button>
-    <button class="footer-link" id="btnBraveCookies">Brave Cookie Settings</button>
+    <button class="footer-link" id="btnManageList">Manage List</button>
+    <button class="footer-link" id="btnExport">Export</button>
+    <button class="footer-link" id="btnImport">Import</button>
+    <button class="footer-link" id="btnBraveCookies">Brave Settings</button>
   </div>
 
-  <!-- Whitelist panel -->
-  <div class="whitelist-panel" id="whitelistPanel">
-    <div class="wl-header">Whitelisted Domains (<span id="wlCount">0</span>)</div>
+  <!-- Hidden file input for import -->
+  <input type="file" id="importFile" accept=".json">
+
+  <!-- Managed domain list panel -->
+  <div class="panel" id="listPanel">
+    <div class="panel-header">
+      Allowed (<span id="wlPermCount">0</span>) &nbsp; Session (<span id="wlSessCount">0</span>)
+    </div>
     <div id="wlList"></div>
   </div>
 </div>

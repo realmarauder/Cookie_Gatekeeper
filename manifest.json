@@ -1,12 +1,13 @@
 {
   "manifest_version": 3,
   "name": "Cookie Gatekeeper",
-  "version": "1.0.0",
-  "description": "Block all cookies by default. Whitelist only the sites you trust with one click.",
+  "version": "2.0.0",
+  "description": "Block all cookies by default. Whitelist or session-allow only the sites you trust with one click.",
   "permissions": [
     "contentSettings",
     "cookies",
     "browsingData",
+    "contextMenus",
     "storage",
     "activeTab",
     "tabs"
